@@ -1,6 +1,7 @@
 "use client";
 
-import AtcShader from "@/components/ui/atc-shader";
+import dynamic from "next/dynamic";
+const AtcShader = dynamic(() => import("@/components/ui/atc-shader"), { ssr: false });
 import Link from "next/link";
 
 const cronograma = [

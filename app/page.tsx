@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import ProjectCard from "@/components/ProjectCard";
 import { type Project } from "@/lib/supabase";
 import Link from "next/link";
-import LiquidCrystalBackground from "@/components/ui/liquid-crystal-shader";
+import dynamic from "next/dynamic";
+const LiquidCrystalBackground = dynamic(
+  () => import("@/components/ui/liquid-crystal-shader"),
+  { ssr: false }
+);
 
 type SortMode = "recent" | "votes";
 
