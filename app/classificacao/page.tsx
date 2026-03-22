@@ -3,6 +3,12 @@
 import { useEffect, useState } from "react";
 import { supabase, type Project } from "@/lib/supabase";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const StarfieldShader = dynamic(
+  () => import("@/components/ui/light-up-shader"),
+  { ssr: false }
+);
 
 export default function ClassificacaoPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -28,10 +34,13 @@ export default function ClassificacaoPage() {
 
   if (!RESULTS_VISIBLE) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4">
-        <div className="w-full max-w-lg bg-[#141414] border border-[#2a2a2a] rounded-2xl p-10 flex flex-col items-center text-center gap-5">
-          {/* Lock icon */}
-          <div className="w-16 h-16 rounded-full bg-[#4488ff]/15 flex items-center justify-center">
+      <div className="relative min-h-[calc(100vh-56px)] flex items-center justify-center px-4 overflow-hidden">
+        {/* Starfield background */}
+        <StarfieldShader />
+
+        {/* Card */}
+        <div className="relative z-10 w-full max-w-lg bg-black/50 backdrop-blur-md border border-white/10 rounded-2xl p-10 flex flex-col items-center text-center gap-5">
+          <div className="w-16 h-16 rounded-full bg-[#4488ff]/20 border border-[#4488ff]/30 flex items-center justify-center">
             <svg className="w-8 h-8 text-[#4488ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <rect x="5" y="11" width="14" height="10" rx="2" />
               <path strokeLinecap="round" d="M8 11V7a4 4 0 0 1 8 0v4" />
