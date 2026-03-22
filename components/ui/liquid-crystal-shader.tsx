@@ -72,75 +72,65 @@ const LiquidCrystalBackground: FC<LiquidCrystalProps> = ({
       return;
     }
 
-    class Renderer {
-      prog: WebGLProgram;
-      uRes: WebGLUniformLocation;
-      uTime: WebGLUniformLocation;
-      uSpeed: WebGLUniformLocation;
-      uRadii: WebGLUniformLocation;
-      uK: WebGLUniformLocation;
-      buf: WebGLBuffer;
+    // Use non-null assertion — gl is confirmed non-null above
+    const ctx = gl as WebGL2RenderingContext;
 
-      constructor() {
-        const compile = (type: GLenum, src: string) => {
-          const s = gl.createShader(type)!;
-          gl.shaderSource(s, src);
-          gl.compileShader(s);
-          if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-            console.error(gl.getShaderInfoLog(s));
-            gl.deleteShader(s);
-            return null;
-          }
-          return s;
-        };
-
-        const vsSrc = `#version 300 es
-        in vec2 position;
-        void main() {
-          gl_Position = vec4(position, 0.0, 1.0);
-        }`;
-        const vs = compile(gl.VERTEX_SHADER, vsSrc)!;
-        const fs = compile(gl.FRAGMENT_SHADER, liquidCrystalShader)!;
-
-        this.prog = gl.createProgram()!;
-        gl.attachShader(this.prog, vs);
-        gl.attachShader(this.prog, fs);
-        gl.linkProgram(this.prog);
-        if (!gl.getProgramParameter(this.prog, gl.LINK_STATUS)) {
-          console.error(gl.getProgramInfoLog(this.prog));
-        }
-
-        const quadVerts = new Float32Array([-1, 1, -1, -1, 1, 1, 1, -1]);
-        this.buf = gl.createBuffer()!;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buf);
-        gl.bufferData(gl.ARRAY_BUFFER, quadVerts, gl.STATIC_DRAW);
-        const posLoc = gl.getAttribLocation(this.prog, "position");
-        gl.enableVertexAttribArray(posLoc);
-        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-        this.uRes   = gl.getUniformLocation(this.prog, "u_resolution")!;
-        this.uTime  = gl.getUniformLocation(this.prog, "u_time")!;
-        this.uSpeed = gl.getUniformLocation(this.prog, "u_speed")!;
-        this.uRadii = gl.getUniformLocation(this.prog, "u_radii")!;
-        this.uK     = gl.getUniformLocation(this.prog, "u_smoothK")!;
+    const compile = (type: GLenum, src: string) => {
+      const s = ctx.createShader(type)!;
+      ctx.shaderSource(s, src);
+      ctx.compileShader(s);
+      if (!ctx.getShaderParameter(s, ctx.COMPILE_STATUS)) {
+        console.error(ctx.getShaderInfoLog(s));
+        ctx.deleteShader(s);
       }
+      return s;
+    };
 
-      render(timeMs: number) {
-        const w = gl.canvas.width;
-        const h = gl.canvas.height;
-        gl.viewport(0, 0, w, h);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.useProgram(this.prog);
-        gl.uniform2f(this.uRes, w, h);
-        gl.uniform1f(this.uTime, timeMs * 0.001);
-        gl.uniform1f(this.uSpeed, speed);
-        gl.uniform3fv(this.uRadii, radii);
-        gl.uniform2fv(this.uK, smoothK);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      }
+    const vsSrc = `#version 300 es
+    in vec2 position;
+    void main() {
+      gl_Position = vec4(position, 0.0, 1.0);
+    }`;
+    const vs = compile(ctx.VERTEX_SHADER, vsSrc);
+    const fs = compile(ctx.FRAGMENT_SHADER, liquidCrystalShader);
+
+    const prog = ctx.createProgram()!;
+    ctx.attachShader(prog, vs);
+    ctx.attachShader(prog, fs);
+    ctx.linkProgram(prog);
+    if (!ctx.getProgramParameter(prog, ctx.LINK_STATUS)) {
+      console.error(ctx.getProgramInfoLog(prog));
     }
 
-    const renderer = new Renderer();
+    const quadVerts = new Float32Array([-1, 1, -1, -1, 1, 1, 1, -1]);
+    const buf = ctx.createBuffer()!;
+    ctx.bindBuffer(ctx.ARRAY_BUFFER, buf);
+    ctx.bufferData(ctx.ARRAY_BUFFER, quadVerts, ctx.STATIC_DRAW);
+    const posLoc = ctx.getAttribLocation(prog, "position");
+    ctx.enableVertexAttribArray(posLoc);
+    ctx.vertexAttribPointer(posLoc, 2, ctx.FLOAT, false, 0, 0);
+
+    const uRes   = ctx.getUniformLocation(prog, "u_resolution")!;
+    const uTime  = ctx.getUniformLocation(prog, "u_time")!;
+    const uSpeed = ctx.getUniformLocation(prog, "u_speed")!;
+    const uRadii = ctx.getUniformLocation(prog, "u_radii")!;
+    const uK     = ctx.getUniformLocation(prog, "u_smoothK")!;
+
+    const renderer = {
+      render(timeMs: number) {
+        const w = ctx.canvas.width;
+        const h = ctx.canvas.height;
+        ctx.viewport(0, 0, w, h);
+        ctx.clear(ctx.COLOR_BUFFER_BIT);
+        ctx.useProgram(prog);
+        ctx.uniform2f(uRes, w, h);
+        ctx.uniform1f(uTime, timeMs * 0.001);
+        ctx.uniform1f(uSpeed, speed);
+        ctx.uniform3fv(uRadii, radii);
+        ctx.uniform2fv(uK, smoothK);
+        ctx.drawArrays(ctx.TRIANGLE_STRIP, 0, 4);
+      },
+    };
 
     const resize = () => {
       const dpr = window.devicePixelRatio || 1;
