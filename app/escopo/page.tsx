@@ -1,5 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
+const WebGLShader = dynamic(
+  () => import("@/components/ui/web-gl-shader").then((m) => m.WebGLShader),
+  { ssr: false }
+);
+
 const escopoCards = [
   {
     icon: (
@@ -59,7 +66,10 @@ const escopoCards = [
 
 export default function EscopoPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
+    <div className="relative min-h-[calc(100vh-56px)] overflow-hidden">
+      <WebGLShader />
+      <div className="absolute inset-0 bg-black/70" />
+    <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-14">
       {/* Header */}
       <div className="text-center mb-14">
         <div className="flex items-center justify-center gap-3 mb-4">
@@ -112,6 +122,7 @@ export default function EscopoPage() {
           será publicado em breve. Fique atento!
         </p>
       </div>
+    </div>
     </div>
   );
 }
