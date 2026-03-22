@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
+import { DottedSurface } from "@/components/ui/dotted-surface";
 
 export default function SubmitPage() {
   const router = useRouter();
@@ -124,28 +125,36 @@ export default function SubmitPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+    <div className="relative min-h-screen">
+      {/* Dotted surface background */}
+      <DottedSurface className="fixed inset-0 z-0" />
+      {/* Subtle overlay — low opacity to keep dots visible */}
+      <div className="fixed inset-0 z-0 bg-black/30" />
+
+    <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 py-10">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white">Submeter Projeto</h1>
         <p className="text-[#9ca3af] mt-1">Compartilhe seu projeto com a comunidade.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6 bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/10">
         {/* Nome */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-[#d1d5db]">
             Nome do Projeto <span className="text-[#e8a020]">*</span>
           </label>
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Ex: Meu Projeto Incrível"
-            maxLength={100}
-            className="w-full px-4 py-2.5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none focus:border-[#e8a020]/50 transition-colors"
-          />
+          <div className="field-glow">
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="Ex: Meu Projeto Incrível"
+              maxLength={100}
+              className="w-full px-4 py-2.5 rounded-lg bg-[#111] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none transition-colors"
+            />
+          </div>
         </div>
 
         {/* Descrição */}
@@ -153,15 +162,17 @@ export default function SubmitPage() {
           <label className="text-sm font-medium text-[#d1d5db]">
             Descrição <span className="text-[#e8a020]">*</span>
           </label>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Descreva o seu projeto, o problema que resolve e como funciona..."
-            rows={5}
-            maxLength={1000}
-            className="w-full px-4 py-2.5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none focus:border-[#e8a020]/50 transition-colors resize-none"
-          />
+          <div className="field-glow">
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              placeholder="Descreva o seu projeto, o problema que resolve e como funciona..."
+              rows={5}
+              maxLength={1000}
+              className="w-full px-4 py-2.5 rounded-lg bg-[#111] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none transition-colors resize-none"
+            />
+          </div>
           <span className="text-xs text-[#6b7280] text-right">{form.description.length}/1000</span>
         </div>
 
@@ -170,14 +181,16 @@ export default function SubmitPage() {
           <label className="text-sm font-medium text-[#d1d5db]">
             Participantes <span className="text-[#e8a020]">*</span>
           </label>
-          <input
-            type="text"
-            name="participants"
-            value={form.participants}
-            onChange={handleChange}
-            placeholder="João Silva, Maria Santos, Pedro Alves"
-            className="w-full px-4 py-2.5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none focus:border-[#e8a020]/50 transition-colors"
-          />
+          <div className="field-glow">
+            <input
+              type="text"
+              name="participants"
+              value={form.participants}
+              onChange={handleChange}
+              placeholder="João Silva, Maria Santos, Pedro Alves"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#111] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none transition-colors"
+            />
+          </div>
           <span className="text-xs text-[#6b7280]">Separe os nomes por vírgula</span>
         </div>
 
@@ -200,19 +213,21 @@ export default function SubmitPage() {
           </div>
 
           {useUrlInput ? (
-            <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://exemplo.com/imagem.png"
-              className="w-full px-4 py-2.5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none focus:border-[#e8a020]/50 transition-colors"
-            />
+            <div className="field-glow">
+              <input
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://exemplo.com/imagem.png"
+                className="w-full px-4 py-2.5 rounded-lg bg-[#111] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none transition-colors"
+              />
+            </div>
           ) : (
             <div
               onClick={() => fileRef.current?.click()}
               className={`relative border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
-                imagePreview ? "border-[#3a3a3a]" : "border-[#2a2a2a] hover:border-[#3a3a3a]"
-              } bg-[#1a1a1a] overflow-hidden`}
+                imagePreview ? "border-[#3a3a3a]" : "border-[#2a2a2a] hover:border-[#e8a020]/40"
+              } bg-[#111] overflow-hidden`}
             >
               {imagePreview ? (
                 <div className="relative w-full h-52">
@@ -251,14 +266,16 @@ export default function SubmitPage() {
         {/* Link do Projeto */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-[#d1d5db]">Link do Projeto</label>
-          <input
-            type="url"
-            name="project_link"
-            value={form.project_link}
-            onChange={handleChange}
-            placeholder="https://meu-projeto.vercel.app"
-            className="w-full px-4 py-2.5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none focus:border-[#e8a020]/50 transition-colors"
-          />
+          <div className="field-glow">
+            <input
+              type="url"
+              name="project_link"
+              value={form.project_link}
+              onChange={handleChange}
+              placeholder="https://meu-projeto.vercel.app"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#111] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none transition-colors"
+            />
+          </div>
         </div>
 
         {/* Error */}
@@ -294,6 +311,7 @@ export default function SubmitPage() {
           )}
         </button>
       </form>
+    </div>
     </div>
   );
 }

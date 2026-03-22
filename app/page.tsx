@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ProjectCard from "@/components/ProjectCard";
 import { type Project } from "@/lib/supabase";
 import Link from "next/link";
+import LiquidCrystalBackground from "@/components/ui/liquid-crystal-shader";
 
 type SortMode = "recent" | "votes";
 
@@ -18,7 +19,7 @@ export default function GalleryPage() {
       try {
         const res = await fetch("/api/projects");
         const data = await res.json();
-        setProjects(data);
+        setProjects(Array.isArray(data) ? data : []);
       } catch {
         /* empty */
       } finally {
@@ -41,19 +42,27 @@ export default function GalleryPage() {
     });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <div className="relative min-h-screen">
+      {/* Liquid crystal background */}
+      <div className="fixed inset-0 z-0">
+        <LiquidCrystalBackground speed={0.4} radii={[0.25, 0.18, 0.3]} smoothK={[0.2, 0.3]} />
+      </div>
+      {/* Dark overlay */}
+      <div className="fixed inset-0 z-0 bg-black/75" />
+
+    <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-10">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Galeria de Projetos</h1>
-        <p className="text-[#9ca3af] mt-1">Explore o que foi construído.</p>
+      <div className="mb-10">
+        <h1 className="text-5xl font-black text-white tracking-tight">Galeria de Projetos</h1>
+        <p className="text-[#9ca3af] mt-2 text-lg">Explore o que foi construído.</p>
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-8">
+      <div className="flex flex-col sm:flex-row gap-3 mb-10">
         {/* Search */}
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1 max-w-md">
           <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6b7280]"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6b7280]"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -67,19 +76,19 @@ export default function GalleryPage() {
             placeholder="Buscar projetos..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-white text-sm placeholder-[#6b7280] focus:outline-none focus:border-[#3a3a3a]"
+            className="w-full pl-11 pr-4 py-2.5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-white text-base placeholder-[#6b7280] focus:outline-none focus:border-[#3a3a3a]"
           />
         </div>
 
         {/* Sort */}
         <div className="flex items-center gap-2">
-          <span className="text-[#6b7280] text-sm shrink-0">Ordenar:</span>
+          <span className="text-[#6b7280] text-base shrink-0">Ordenar:</span>
           <div className="flex rounded-lg border border-[#2a2a2a] overflow-hidden">
             {(["recent", "votes"] as SortMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setSort(mode)}
-                className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`px-4 py-2 text-base font-medium transition-colors ${
                   sort === mode
                     ? "bg-[#2a2a2a] text-white"
                     : "text-[#6b7280] hover:text-white hover:bg-[#1e1e1e]"
@@ -132,6 +141,7 @@ export default function GalleryPage() {
           ))}
         </div>
       )}
+    </div>
     </div>
   );
 }

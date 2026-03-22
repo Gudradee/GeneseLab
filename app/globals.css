@@ -37,3 +37,39 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #444;
 }
+
+/* Animated glow wrapper for form fields */
+.field-glow {
+  position: relative;
+  border-radius: 0.5rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.field-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 0.55rem;
+  background: linear-gradient(135deg, #e8a020, #ff6b35, #e8a020, #4488ff);
+  background-size: 300% 300%;
+  opacity: 0;
+  z-index: 0;
+  transition: opacity 0.3s ease;
+  animation: glowShift 3s ease infinite;
+  pointer-events: none;
+}
+
+.field-glow:focus-within::before {
+  opacity: 1;
+}
+
+.field-glow > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes glowShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
