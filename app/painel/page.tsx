@@ -137,7 +137,7 @@ export default function PainelPage() {
               href="/submit"
               className="px-6 py-3 rounded-xl bg-[#4488ff] text-white font-semibold text-sm hover:bg-[#3377ee] transition-colors"
             >
-              Submeter Projeto
+              Criar Projeto
             </Link>
             <Link
               href="/escopo"
