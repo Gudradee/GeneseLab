@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth-context";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 const DottedSurface = dynamic(
@@ -12,7 +13,19 @@ const DottedSurface = dynamic(
 
 export default function SubmitPage() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
+  const [isMember, setIsMember] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { setIsMember(false); return; }
+    supabase
+      .from("members")
+      .select("email", { count: "exact", head: true })
+      .eq("email", user.email)
+      .then(({ count }) => setIsMember((count ?? 0) > 0));
+  }, [user, loading]);
 
   const [form, setForm] = useState({
     name: "",
@@ -124,6 +137,35 @@ export default function SubmitPage() {
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">Projeto submetido!</h2>
         <p className="text-[#9ca3af]">Redirecionando para a galeria...</p>
+      </div>
+    );
+  }
+
+  if (loading || isMember === null) {
+    return (
+      <div className="flex items-center justify-center min-h-[70vh]">
+        <div className="w-6 h-6 rounded-full border-2 border-[#e8a020]/30 border-t-[#e8a020] animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    router.replace("/login");
+    return null;
+  }
+
+  if (!isMember) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4 gap-4">
+        <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center">
+          <svg className="w-7 h-7 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-bold text-white">Acesso restrito</h2>
+        <p className="text-[#6b7280] text-sm max-w-xs">
+          Apenas membros da LEIbmec podem criar projetos. Entre em contato com a diretoria para solicitar acesso.
+        </p>
       </div>
     );
   }

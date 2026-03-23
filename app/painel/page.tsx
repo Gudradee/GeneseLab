@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 const AtcShader = dynamic(() => import("@/components/ui/atc-shader"), { ssr: false });
 import Link from "next/link";
 
@@ -70,10 +70,18 @@ const cronograma = [
 export default function PainelPage() {
   // Find index of the nearest upcoming (or current) event
   const [cardIndex, setCardIndex] = useState(0);
-  const VISIBLE = 4;
+  const [visible, setVisible] = useState(4);
   const TOTAL = 7;
+
+  useEffect(() => {
+    const update = () => setVisible(window.innerWidth < 640 ? 2 : 4);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   const canPrev = cardIndex > 0;
-  const canNext = cardIndex + VISIBLE < TOTAL;
+  const canNext = cardIndex + visible < TOTAL;
 
   const nextIndex = useMemo(() => {
     const today = new Date();
@@ -252,10 +260,9 @@ export default function PainelPage() {
               </button>
 
               {/* Cards */}
-              <div className="flex-1 grid grid-cols-4 gap-4">
+              <div className={`flex-1 grid gap-3 ${visible === 2 ? "grid-cols-2" : "grid-cols-4"}`}>
                 {Array.from({ length: TOTAL }, (_, i) => {
-                  const visible = i >= cardIndex && i < cardIndex + VISIBLE;
-                  if (!visible) return null;
+                  if (i < cardIndex || i >= cardIndex + visible) return null;
                   return (
                     <div
                       key={i}
@@ -285,7 +292,7 @@ export default function PainelPage() {
 
               {/* Next arrow */}
               <button
-                onClick={() => setCardIndex((v) => Math.min(TOTAL - VISIBLE, v + 1))}
+                onClick={() => setCardIndex((v) => Math.min(TOTAL - visible, v + 1))}
                 disabled={!canNext}
                 className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full border border-[#2a2a2a] bg-[#0e0e0e] text-[#4a4a4a] hover:border-[#e8a020]/50 hover:text-[#e8a020] disabled:opacity-20 disabled:pointer-events-none transition-all"
               >
@@ -297,7 +304,7 @@ export default function PainelPage() {
 
             {/* Dot indicators */}
             <div className="flex items-center justify-center gap-1.5 mt-5">
-              {Array.from({ length: TOTAL - VISIBLE + 1 }, (_, i) => (
+              {Array.from({ length: TOTAL - visible + 1 }, (_, i) => (
                 <button
                   key={i}
                   onClick={() => setCardIndex(i)}
