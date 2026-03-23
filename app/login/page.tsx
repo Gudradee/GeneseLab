@@ -113,10 +113,10 @@ export default function LoginPage() {
               <input
                 type="text"
                 value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                placeholder="000000"
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                placeholder="00000000"
                 required
-                maxLength={6}
+                maxLength={8}
                 className="w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-white text-xl text-center font-mono tracking-[0.5em] placeholder-[#3a3a3a] focus:outline-none focus:border-[#e8a020]/50 transition-colors"
               />
             </div>
